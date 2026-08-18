@@ -104,6 +104,7 @@ input:focus{
   box-shadow:0 6px 24px rgba(99,102,241,0.4);
 }
 .btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:0.5;pointer-events:none}
 #msg{
   margin-top:20px;padding:12px 16px;
   border-radius:10px;font-size:14px;
@@ -131,41 +132,40 @@ input:focus{
   color:rgba(255,255,255,0.35);
   font-size:12px;margin-top:20px;
 }
-.hint a{color:rgba(99,102,241,0.8);text-decoration:none}
-.hint a:hover{text-decoration:underline}
-#password-group{transition:all 0.3s}
-.hidden{display:none!important}
-.loading .btn-primary{opacity:0.7;pointer-events:none}
 @media(max-width:480px){
   .login-card{padding:32px 24px}
   h1{font-size:24px}
-  .tab{font-size:11px;padding:8px 4px}
 }
 </style>
 </head>
 <body>
 
-<div class="login-card" id="card">
+<div class="login-card">
   <div class="logo">T</div>
   <h1>TEAM TROY</h1>
   <p class="subtitle">Internal Operations Portal</p>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('request')">Request Access</button>
-    <button class="tab" onclick="switchTab('login')">Login</button>
-    <button class="tab" onclick="switchTab('setup')">Set Up Account</button>
+    <button class="tab active" id="tab-request" onclick="switchTab('request')">Request Access</button>
+    <button class="tab" id="tab-login" onclick="switchTab('login')">Login</button>
   </div>
 
+  <!-- Request Access Form -->
   <div id="request-form">
     <div class="form-group">
       <label>Email Address</label>
       <input type="email" id="req-email" placeholder="you@company.com">
     </div>
-    <button class="btn btn-primary" onclick="requestAccess()">Request Access</button>
-    <p class="hint">Enter your email and the admin will review your request</p>
+    <div class="form-group">
+      <label>Choose a Password</label>
+      <input type="password" id="req-password" placeholder="Min 6 characters">
+    </div>
+    <button class="btn btn-primary" id="req-btn" onclick="requestAccess()">Request Access</button>
+    <p class="hint">Your request will be sent to the admin for approval</p>
   </div>
 
-  <div id="login-form" class="hidden">
+  <!-- Login Form -->
+  <div id="login-form" style="display:none">
     <div class="form-group">
       <label>Email Address</label>
       <input type="email" id="login-email" placeholder="you@company.com">
@@ -174,21 +174,8 @@ input:focus{
       <label>Password</label>
       <input type="password" id="login-password" placeholder="Your password">
     </div>
-    <button class="btn btn-primary" onclick="login()">Login</button>
-    <p class="hint">Don't have a password yet? <a href="#" onclick="switchTab('setup');return false">Set up your account</a></p>
-  </div>
-
-  <div id="setup-form" class="hidden">
-    <div class="form-group">
-      <label>Email Address</label>
-      <input type="email" id="setup-email" placeholder="you@company.com">
-    </div>
-    <div class="form-group">
-      <label>Choose a Password</label>
-      <input type="password" id="setup-password" placeholder="Min 6 characters">
-    </div>
-    <button class="btn btn-primary" onclick="setupAccount()">Create Account</button>
-    <p class="hint">Only works after your access has been approved by admin</p>
+    <button class="btn btn-primary" id="login-btn" onclick="login()">Login</button>
+    <p class="hint">Only approved members can login</p>
   </div>
 
   <div id="msg"></div>
@@ -196,133 +183,150 @@ input:focus{
 
 <script>
 function switchTab(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>{
-    t.classList.toggle('active',
-      (tab==='request'&&i===0)||(tab==='login'&&i===1)||(tab==='setup'&&i===2));
-  });
-  document.getElementById('request-form').classList.toggle('hidden',tab!=='request');
-  document.getElementById('login-form').classList.toggle('hidden',tab!=='login');
-  document.getElementById('setup-form').classList.toggle('hidden',tab!=='setup');
+  document.getElementById('tab-request').classList.toggle('active', tab==='request');
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('request-form').style.display = tab==='request' ? '' : 'none';
+  document.getElementById('login-form').style.display = tab==='login' ? '' : 'none';
   clearMsg();
 }
 
-function showMsg(text,type){
-  const m=document.getElementById('msg');
-  m.textContent=text;
-  m.className=type;
+function showMsg(text, type){
+  const m = document.getElementById('msg');
+  m.textContent = text;
+  m.className = type;
 }
 function clearMsg(){
-  const m=document.getElementById('msg');
-  m.textContent='';m.className='';m.style.display='none';
+  const m = document.getElementById('msg');
+  m.textContent = '';
+  m.className = '';
+  m.style.display = 'none';
 }
 
 async function requestAccess(){
-  const email=document.getElementById('req-email').value.trim();
-  if(!email){showMsg('Please enter your email','error');return}
+  const email = document.getElementById('req-email').value.trim();
+  const password = document.getElementById('req-password').value;
 
-  // Check if already exists
-  const {data:existing}=await supabaseClient
-    .from('eric').select('email,approved').eq('email',email).single();
+  if(!email || !password){
+    showMsg('Please enter both email and password', 'error');
+    return;
+  }
+  if(password.length < 6){
+    showMsg('Password must be at least 6 characters', 'error');
+    return;
+  }
 
-  if(existing){
-    if(existing.approved){
-      showMsg('You are already approved! Go to Login or Set Up Account.','info');
-    }else{
-      showMsg('Your request is already pending. Please wait for admin approval.','info');
+  document.getElementById('req-btn').disabled = true;
+  document.getElementById('req-btn').textContent = 'Submitting...';
+
+  try {
+    // Step 1: Create Supabase auth account
+    const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+      email,
+      password
+    });
+
+    if(signUpError){
+      if(signUpError.message.includes('already registered')){
+        showMsg('This email has already been registered. Try logging in.', 'info');
+      } else {
+        showMsg(signUpError.message, 'error');
+      }
+      return;
     }
-    return;
-  }
 
-  const {error}=await supabaseClient
-    .from('eric').insert({email:email,approved:false,role:'user'});
+    // Step 2: Insert into eric table with approved=false
+    const { error: insertError } = await supabaseClient
+      .from('eric')
+      .insert({ email: email, approved: false, role: 'user' });
 
-  if(error){
-    showMsg('Something went wrong. Please try again.','error');
-    return;
-  }
-  showMsg('Request submitted! The admin will review your access shortly.','success');
-  document.getElementById('req-email').value='';
-}
-
-async function setupAccount(){
-  const email=document.getElementById('setup-email').value.trim();
-  const password=document.getElementById('setup-password').value;
-
-  if(!email||!password){showMsg('Please fill in both fields','error');return}
-  if(password.length<6){showMsg('Password must be at least 6 characters','error');return}
-
-  // Check if approved
-  const {data}=await supabaseClient
-    .from('eric').select('approved').eq('email',email).single();
-
-  if(!data){
-    showMsg('No access request found for this email. Request access first.','error');
-    return;
-  }
-  if(!data.approved){
-    showMsg('Your access is still pending approval. Please wait.','info');
-    return;
-  }
-
-  // Create Supabase auth account
-  const {error}=await supabaseClient.auth.signUp({email,password});
-
-  if(error){
-    if(error.message.includes('already registered')){
-      showMsg('Account already set up! Go to Login.','info');
-    }else{
-      showMsg(error.message,'error');
+    if(insertError){
+      console.log('Insert error:', insertError);
+      // If duplicate, that's fine — they already requested
+      if(insertError.code === '23505'){
+        showMsg('You already have a pending request. Please wait for admin approval.', 'info');
+      } else {
+        showMsg('Request submitted! Wait for admin approval.', 'success');
+      }
+      return;
     }
-    return;
-  }
 
-  showMsg('Account created! You can now login. Check your email if confirmation is needed.','success');
+    // Sign out so they don't stay logged in before approval
+    await supabaseClient.auth.signOut();
+
+    showMsg('Request submitted! The admin will review your access. You can login after approval.', 'success');
+    document.getElementById('req-email').value = '';
+    document.getElementById('req-password').value = '';
+
+  } catch(err){
+    showMsg('Something went wrong. Please try again.', 'error');
+    console.log('Request error:', err);
+  } finally {
+    document.getElementById('req-btn').disabled = false;
+    document.getElementById('req-btn').textContent = 'Request Access';
+  }
 }
 
 async function login(){
-  const email=document.getElementById('login-email').value.trim();
-  const password=document.getElementById('login-password').value;
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
 
-  if(!email||!password){showMsg('Please fill in both fields','error');return}
-
-  const {error}=await supabaseClient.auth.signInWithPassword({email,password});
-
-  if(error){
-    showMsg('Invalid email or password','error');
+  if(!email || !password){
+    showMsg('Please enter both email and password', 'error');
     return;
   }
 
-  const {data}=await supabaseClient
-    .from('eric').select('approved,role').eq('email',email).single();
+  document.getElementById('login-btn').disabled = true;
+  document.getElementById('login-btn').textContent = 'Logging in...';
 
-  if(!data){
-    showMsg('Account not found in the system','error');
-    await supabaseClient.auth.signOut();
-    return;
-  }
+  try {
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-  if(!data.approved){
-    showMsg('Your access is still pending approval','info');
-    await supabaseClient.auth.signOut();
-    return;
-  }
+    if(error){
+      showMsg('Invalid email or password', 'error');
+      return;
+    }
 
-  // Approved — redirect based on role
-  if(data.role==='admin'){
-    window.location.href='portal.html';
-  }else{
-    window.location.href='portal.html';
+    // Check approval in eric table
+    const { data } = await supabaseClient
+      .from('eric')
+      .select('approved, role')
+      .eq('email', email)
+      .single();
+
+    if(!data){
+      showMsg('Account not found. Please request access first.', 'error');
+      await supabaseClient.auth.signOut();
+      return;
+    }
+
+    if(!data.approved){
+      showMsg('Your access is still pending admin approval.', 'info');
+      await supabaseClient.auth.signOut();
+      return;
+    }
+
+    // Approved — go to portal
+    window.location.href = 'portal.html';
+
+  } catch(err){
+    showMsg('Something went wrong. Please try again.', 'error');
+  } finally {
+    document.getElementById('login-btn').disabled = false;
+    document.getElementById('login-btn').textContent = 'Login';
   }
 }
 
-// If already logged in, redirect
-(async()=>{
-  const {data:{user}}=await supabaseClient.auth.getUser();
+// If already logged in and approved, redirect
+(async () => {
+  const { data: { user } } = await supabaseClient.auth.getUser();
   if(user){
-    const {data}=await supabaseClient
-      .from('eric').select('approved').eq('email',user.email).single();
-    if(data&&data.approved){
-      window.location.href='portal.html';
+    const { data } = await supabaseClient
+      .from('eric')
+      .select('approved')
+      .eq('email', user.email)
+      .single();
+    if(data && data.approved){
+      window.location.href = 'portal.html';
     }
   }
 })();
