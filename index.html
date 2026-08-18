@@ -12,10 +12,10 @@
 body{
 font-family:Arial;
 background:#f5f7fb;
-display:flex;
 height:100vh;
-align-items:center;
+display:flex;
 justify-content:center;
+align-items:center;
 }
 
 .card{
@@ -30,7 +30,7 @@ text-align:center;
 input{
 width:100%;
 padding:12px;
-margin:10px 0;
+margin:8px 0;
 border-radius:10px;
 border:1px solid #ddd;
 }
@@ -38,25 +38,23 @@ border:1px solid #ddd;
 button{
 width:100%;
 padding:12px;
-background:#111827;
-color:white;
+margin-top:10px;
 border:0;
 border-radius:10px;
+background:#111827;
+color:white;
 cursor:pointer;
 }
 
-#message{
+#msg{
 margin-top:15px;
-color:#555;
 }
 
 </style>
 
 </head>
 
-
 <body>
-
 
 <div class="card">
 
@@ -75,7 +73,12 @@ Login
 </button>
 
 
-<div id="message"></div>
+<button onclick="requestAccess()">
+Request Access
+</button>
+
+
+<div id="msg"></div>
 
 
 </div>
@@ -87,18 +90,11 @@ Login
 
 async function login(){
 
-
-let email =
-document.getElementById("email").value;
-
-
-let password =
-document.getElementById("password").value;
+let email=document.getElementById("email").value;
+let password=document.getElementById("password").value;
 
 
-
-const {data,error} =
-await supabaseClient.auth.signInWithPassword({
+const {error}=await supabaseClient.auth.signInWithPassword({
 
 email,
 password
@@ -106,10 +102,9 @@ password
 });
 
 
-
 if(error){
 
-document.getElementById("message").innerHTML =
+document.getElementById("msg").innerHTML=
 "Login failed";
 
 return;
@@ -117,36 +112,30 @@ return;
 }
 
 
-
-const {data:userData,error:userError} =
-await supabaseClient
+const {data}=await supabaseClient
 .from("eric")
-.select("approved")
+.select("*")
 .eq("email",email)
 .single();
 
 
+if(!data){
 
-if(userError){
-
-document.getElementById("message").innerHTML =
-"User not approved";
+document.getElementById("msg").innerHTML=
+"Account pending setup";
 
 return;
 
 }
 
 
-
-if(userData.approved === true){
+if(data.approved){
 
 window.location.href="portal.html";
 
-}
+}else{
 
-else{
-
-document.getElementById("message").innerHTML =
+document.getElementById("msg").innerHTML=
 "Waiting for owner approval";
 
 }
@@ -155,8 +144,62 @@ document.getElementById("message").innerHTML =
 }
 
 
-</script>
 
+async function requestAccess(){
+
+
+let email=document.getElementById("email").value;
+let password=document.getElementById("password").value;
+
+
+if(!email || !password){
+
+alert("Enter email and password");
+
+return;
+
+}
+
+
+const {error}=await supabaseClient.auth.signUp({
+
+email,
+password
+
+});
+
+
+if(error){
+
+document.getElementById("msg").innerHTML=
+error.message;
+
+return;
+
+}
+
+
+
+await supabaseClient
+.from("eric")
+.insert({
+
+email:email,
+approved:false,
+role:"user"
+
+});
+
+
+
+document.getElementById("msg").innerHTML=
+"Request submitted. Wait for approval.";
+
+}
+
+
+
+</script>
 
 </body>
 </html>
