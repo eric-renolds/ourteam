@@ -8,6 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
+
 <style>
 
 body{
@@ -16,29 +17,25 @@ background:#f5f7fb;
 padding:40px;
 }
 
+
 .card{
 
 background:white;
 padding:25px;
 border-radius:20px;
-margin-bottom:20px;
-box-shadow:0 10px 25px #ddd;
+margin:20px;
 
 }
+
 
 button{
 
 background:#111827;
 color:white;
-border:none;
-padding:10px 18px;
+padding:10px;
+border:0;
 border-radius:10px;
-cursor:pointer;
 
-}
-
-h1{
-text-align:center;
 }
 
 </style>
@@ -51,32 +48,21 @@ text-align:center;
 
 <h1>TEAM TROY ADMIN</h1>
 
-<div id="users"></div>
+<div id="list"></div>
 
 
 
 <script>
 
 
-async function checkAdmin(){
+async function load(){
 
 
-const {data:{user}} =
+const {data:{user}}=
 await supabaseClient.auth.getUser();
 
 
-if(!user){
-
-window.location.href="index.html";
-
-return;
-
-}
-
-
-
-const {data:admin} =
-await supabaseClient
+const {data:admin}=await supabaseClient
 .from("eric")
 .select("role")
 .eq("email",user.email)
@@ -84,27 +70,17 @@ await supabaseClient
 
 
 
-if(!admin || admin.role !== "admin"){
+if(!admin || admin.role!="admin"){
 
-document.body.innerHTML =
-"Access denied";
+document.body.innerHTML="Access Denied";
 
 return;
 
 }
 
 
-loadUsers();
 
-
-}
-
-
-
-async function loadUsers(){
-
-
-const {data,error}=await supabaseClient
+const {data}=await supabaseClient
 .from("eric")
 .select("*")
 .eq("approved",false);
@@ -114,18 +90,18 @@ const {data,error}=await supabaseClient
 let html="";
 
 
-data.forEach(user=>{
+data.forEach(u=>{
 
 
-html += `
+html+=`
 
 <div class="card">
 
-<h3>${user.email}</h3>
+<h3>${u.email}</h3>
 
-<p>Status: Waiting</p>
+<p>Pending approval</p>
 
-<button onclick="approve('${user.email}')">
+<button onclick="approve('${u.email}')">
 Approve
 </button>
 
@@ -137,10 +113,11 @@ Approve
 });
 
 
-document.getElementById("users").innerHTML=html;
+document.getElementById("list").innerHTML=html;
 
 
 }
+
 
 
 
@@ -150,22 +127,23 @@ async function approve(email){
 await supabaseClient
 .from("eric")
 .update({
+
 approved:true
+
 })
 .eq("email",email);
 
 
-alert("User approved");
+alert("Approved");
 
 
-loadUsers();
+load();
 
 
 }
 
 
-
-checkAdmin();
+load();
 
 
 </script>
