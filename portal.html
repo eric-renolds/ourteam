@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Team Troy Portal</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f5f7fb;
+margin:0;
+}
+
+.header{
+background:#111827;
+color:white;
+padding:40px;
+text-align:center;
+}
+
+.container{
+max-width:1100px;
+margin:40px auto;
+padding:20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:25px;
+}
+
+.card{
+
+background:white;
+padding:30px;
+border-radius:20px;
+box-shadow:0 10px 30px #ddd;
+
+}
+
+button{
+
+background:#111827;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:10px;
+cursor:pointer;
+
+}
+
+
+.box{
+
+background:#f3f4f6;
+padding:15px;
+border-radius:10px;
+white-space:pre-line;
+
+}
+
+
+.step{
+
+padding:12px;
+background:#f9fafb;
+margin:10px 0;
+border-radius:10px;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+<h1>TEAM TROY</h1>
+
+<p>Internal Operations Portal</p>
+
+</div>
+
+
+
+<div class="container">
+
+
+<div class="grid">
+
+
+<div class="card">
+
+<h2>📧 CC List</h2>
+
+<div id="cc" class="box">
+
+operations@company.com
+manager@company.com
+accounts@company.com
+
+</div>
+
+
+<button onclick="copy('cc')">
+Copy CC Emails
+</button>
+
+
+</div>
+
+
+
+<div class="card">
+
+<h2>✍️ Email Signature</h2>
+
+
+<div id="signature" class="box">
+
+Regards,
+
+Team Troy
+
+Company Name
+
+Phone:
+Email:
+Website:
+
+</div>
+
+
+<button onclick="copy('signature')">
+Copy Signature
+</button>
+
+
+</div>
+
+
+
+
+<div class="card">
+
+<h2>📅 Meeting SOP</h2>
+
+
+<div class="step">
+1. Check calendar details
+</div>
+
+<div class="step">
+2. Confirm attendees
+</div>
+
+<div class="step">
+3. Add required CC members
+</div>
+
+<div class="step">
+4. Send approved meeting email
+</div>
+
+<div class="step">
+5. Update tracker
+</div>
+
+
+</div>
+
+
+
+
+<div class="card">
+
+<h2>⏰ Late Arrival SOP</h2>
+
+
+<div class="step">
+1. Inform manager immediately
+</div>
+
+<div class="step">
+2. Send delay notification
+</div>
+
+<div class="step">
+3. Update availability status
+</div>
+
+<div class="step">
+4. Complete pending tasks
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+function copy(id){
+
+let text=document.getElementById(id).innerText;
+
+navigator.clipboard.writeText(text);
+
+alert("Copied!");
+
+}
+
+</script>
+
+
+</body>
+
+</html>
