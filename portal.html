@@ -1,254 +1,460 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-<title>Team Troy Portal</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Troy - Portal</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
-
-
 <style>
-
+*{margin:0;padding:0;box-sizing:border-box}
 body{
-font-family:Arial;
-background:#f5f7fb;
-margin:0;
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  background:#0f172a;color:#e2e8f0;
+  min-height:100vh;
 }
 
-
+/* Header */
 .header{
-background:#111827;
-color:white;
-padding:40px;
-text-align:center;
+  background:linear-gradient(135deg,#1e293b,#0f172a);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding:0 24px;
+  position:sticky;top:0;z-index:100;
+}
+.header-inner{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;
+}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-logo{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:16px;color:#fff;
+}
+.header-title{font-size:18px;font-weight:700;color:#fff;letter-spacing:0.5px}
+.header-right{display:flex;align-items:center;gap:16px}
+.user-email{
+  color:rgba(255,255,255,0.4);font-size:13px;
+  display:none;
+}
+.btn-admin{
+  padding:8px 16px;border-radius:8px;
+  background:rgba(99,102,241,0.15);
+  border:1px solid rgba(99,102,241,0.3);
+  color:#a5b4fc;font-size:13px;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all 0.2s;
+}
+.btn-admin:hover{background:rgba(99,102,241,0.25)}
+.btn-logout{
+  padding:8px 16px;border-radius:8px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.6);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-logout:hover{background:rgba(255,255,255,0.1);color:#fff}
+
+/* Search */
+.search-bar{
+  max-width:1200px;margin:24px auto 0;padding:0 24px;
+}
+.search-input{
+  width:100%;padding:14px 20px 14px 48px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;color:#fff;font-size:15px;
+  outline:none;transition:all 0.3s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='9' cy='9' r='7'/%3E%3Cpath d='M16 16l-4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:16px center;
+}
+.search-input::placeholder{color:rgba(255,255,255,0.25)}
+.search-input:focus{
+  border-color:rgba(99,102,241,0.5);
+  background-color:rgba(255,255,255,0.08);
+  box-shadow:0 0 0 3px rgba(99,102,241,0.1);
 }
 
+/* Category Tabs */
+.categories{
+  max-width:1200px;margin:20px auto 0;padding:0 24px;
+  display:flex;gap:8px;overflow-x:auto;
+  -ms-overflow-style:none;scrollbar-width:none;
+}
+.categories::-webkit-scrollbar{display:none}
+.cat-tab{
+  padding:8px 18px;border-radius:20px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.5);
+  font-size:13px;font-weight:600;
+  cursor:pointer;white-space:nowrap;transition:all 0.2s;
+}
+.cat-tab.active{
+  background:rgba(99,102,241,0.2);
+  border-color:rgba(99,102,241,0.4);
+  color:#a5b4fc;
+}
+.cat-tab:hover:not(.active){
+  background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);
+}
 
+/* Content */
 .container{
-max-width:1000px;
-margin:40px auto;
+  max-width:1200px;margin:24px auto;padding:0 24px 40px;
+}
+.section-title{
+  font-size:13px;font-weight:700;
+  color:rgba(255,255,255,0.3);
+  text-transform:uppercase;letter-spacing:1px;
+  margin:32px 0 16px;
+}
+.cards-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+  gap:16px;
 }
 
-
+/* Card */
 .card{
-background:white;
-padding:30px;
-border-radius:20px;
-margin-bottom:20px;
-box-shadow:0 10px 25px #ddd;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:16px;padding:24px;
+  transition:all 0.3s;
+}
+.card:hover{
+  background:rgba(255,255,255,0.06);
+  border-color:rgba(255,255,255,0.1);
+  transform:translateY(-2px);
+  box-shadow:0 8px 30px rgba(0,0,0,0.3);
+}
+.card-header{
+  display:flex;align-items:center;gap:12px;margin-bottom:16px;
+}
+.card-icon{
+  width:42px;height:42px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.card-icon.email{background:rgba(99,102,241,0.15)}
+.card-icon.sig{background:rgba(236,72,153,0.15)}
+.card-icon.sop{background:rgba(34,197,94,0.15)}
+.card-icon.process{background:rgba(251,191,36,0.15)}
+.card-title{font-size:17px;font-weight:700;color:#fff}
+.card-desc{
+  color:rgba(255,255,255,0.4);font-size:13px;margin-top:2px;
 }
 
-
-button{
-background:#111827;
-color:white;
-border:0;
-padding:12px 20px;
-border-radius:10px;
-cursor:pointer;
+.content-box{
+  background:rgba(0,0,0,0.2);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:10px;padding:16px;
+  font-size:14px;line-height:1.7;
+  color:rgba(255,255,255,0.7);
+  white-space:pre-line;
+  margin-bottom:16px;
 }
 
-
-.box{
-background:#f3f4f6;
-padding:15px;
-border-radius:10px;
-white-space:pre-line;
+.sop-steps{margin-bottom:16px}
+.sop-step{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.sop-step:last-child{border-bottom:none}
+.step-num{
+  width:28px;height:28px;border-radius:8px;
+  background:rgba(99,102,241,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#a5b4fc;
+  flex-shrink:0;
+}
+.step-text{
+  color:rgba(255,255,255,0.7);font-size:14px;
+  line-height:1.5;padding-top:3px;
 }
 
+.btn-copy{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:10px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  border:none;color:#fff;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-copy:hover{
+  transform:translateY(-1px);
+  box-shadow:0 4px 16px rgba(99,102,241,0.4);
+}
+.btn-copy:active{transform:translateY(0)}
+.btn-copy.copied{
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+}
 
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:#22c55e;color:#fff;
+  padding:12px 24px;border-radius:12px;
+  font-size:14px;font-weight:600;
+  transform:translateY(80px);opacity:0;
+  transition:all 0.3s;z-index:1000;
+  box-shadow:0 8px 24px rgba(34,197,94,0.3);
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* Loading overlay */
+.loading-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:#0f172a;display:flex;align-items:center;
+  justify-content:center;z-index:9999;transition:opacity 0.3s;
+}
+.loading-overlay.hide{opacity:0;pointer-events:none}
+.spinner{
+  width:40px;height:40px;
+  border:3px solid rgba(255,255,255,0.1);
+  border-top-color:#6366f1;border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* No results */
+.no-results{
+  text-align:center;padding:60px 20px;
+  color:rgba(255,255,255,0.3);
+}
+.no-results-icon{font-size:48px;margin-bottom:12px}
+.no-results-text{font-size:16px}
+
+@media(max-width:640px){
+  .header-inner{height:56px}
+  .header-title{font-size:15px}
+  .user-email{display:none!important}
+  .cards-grid{grid-template-columns:1fr}
+  .search-input{font-size:14px;padding:12px 16px 12px 44px}
+  .card{padding:20px}
+}
 </style>
-
 </head>
-
-
 <body>
 
-
-<div class="header">
-
-<h1>TEAM TROY</h1>
-
-<p>Internal Operations Portal</p>
-
-<button onclick="logout()">
-Logout
-</button>
-
+<div class="loading-overlay" id="loader">
+  <div class="spinner"></div>
 </div>
 
+<header class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-logo">T</div>
+      <span class="header-title">TEAM TROY</span>
+    </div>
+    <div class="header-right">
+      <span class="user-email" id="user-email"></span>
+      <a href="admin.html" class="btn-admin" id="admin-link" style="display:none">Admin Panel</a>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</header>
 
-<div class="container">
+<div class="search-bar">
+  <input type="text" class="search-input" id="search" placeholder="Search SOPs, emails, resources..." oninput="filterCards()">
+</div>
 
+<div class="categories" id="categories">
+  <button class="cat-tab active" onclick="filterCategory('all',this)">All</button>
+  <button class="cat-tab" onclick="filterCategory('email',this)">Email Resources</button>
+  <button class="cat-tab" onclick="filterCategory('sop',this)">SOPs</button>
+  <button class="cat-tab" onclick="filterCategory('process',this)">Processes</button>
+</div>
 
-<div class="card">
+<div class="container" id="content">
 
-<h2>📧 CC List</h2>
+  <!-- Email Resources -->
+  <div class="section-title" data-section="email">Email Resources</div>
+  <div class="cards-grid">
 
-<div id="cc" class="box">
-
-operations@company.com
+    <div class="card" data-category="email" data-search="cc list email operations manager accounts">
+      <div class="card-header">
+        <div class="card-icon email">&#x1f4e7;</div>
+        <div>
+          <div class="card-title">CC List</div>
+          <div class="card-desc">Standard CC recipients for team emails</div>
+        </div>
+      </div>
+      <div class="content-box" id="cc-content">operations@company.com
 manager@company.com
-accounts@company.com
+accounts@company.com</div>
+      <button class="btn-copy" onclick="copyText('cc-content',this)">
+        <span>&#x1f4cb;</span> Copy CC Emails
+      </button>
+    </div>
 
-</div>
-
-<button onclick="copy('cc')">
-Copy CC Emails
-</button>
-
-</div>
-
-
-
-<div class="card">
-
-<h2>✍️ Email Signature</h2>
-
-<div id="sig" class="box">
-
-Regards,
+    <div class="card" data-category="email" data-search="email signature regards team troy company phone website">
+      <div class="card-header">
+        <div class="card-icon sig">&#x270d;&#xfe0f;</div>
+        <div>
+          <div class="card-title">Email Signature</div>
+          <div class="card-desc">Standard email signature template</div>
+        </div>
+      </div>
+      <div class="content-box" id="sig-content">Regards,
 
 Team Troy
-
 Company Name
 
 Phone:
 Email:
-Website:
+Website:</div>
+      <button class="btn-copy" onclick="copyText('sig-content',this)">
+        <span>&#x1f4cb;</span> Copy Signature
+      </button>
+    </div>
+
+  </div>
+
+  <!-- SOPs -->
+  <div class="section-title" data-section="sop">Standard Operating Procedures</div>
+  <div class="cards-grid">
+
+    <div class="card" data-category="sop" data-search="meeting sop calendar attendees cc email tracker">
+      <div class="card-header">
+        <div class="card-icon sop">&#x1f4c5;</div>
+        <div>
+          <div class="card-title">Meeting SOP</div>
+          <div class="card-desc">Standard procedure for scheduling meetings</div>
+        </div>
+      </div>
+      <div class="sop-steps">
+        <div class="sop-step"><div class="step-num">1</div><div class="step-text">Check calendar details</div></div>
+        <div class="sop-step"><div class="step-num">2</div><div class="step-text">Confirm attendees</div></div>
+        <div class="sop-step"><div class="step-num">3</div><div class="step-text">Add required CC members</div></div>
+        <div class="sop-step"><div class="step-num">4</div><div class="step-text">Send approved meeting email</div></div>
+        <div class="sop-step"><div class="step-num">5</div><div class="step-text">Update tracker</div></div>
+      </div>
+    </div>
+
+    <div class="card" data-category="sop" data-search="late arrival inform manager delay notification availability tasks">
+      <div class="card-header">
+        <div class="card-icon process">&#x23f0;</div>
+        <div>
+          <div class="card-title">Late Arrival SOP</div>
+          <div class="card-desc">Steps to follow when running late</div>
+        </div>
+      </div>
+      <div class="sop-steps">
+        <div class="sop-step"><div class="step-num">1</div><div class="step-text">Inform manager immediately</div></div>
+        <div class="sop-step"><div class="step-num">2</div><div class="step-text">Send delay notification</div></div>
+        <div class="sop-step"><div class="step-num">3</div><div class="step-text">Update availability status</div></div>
+        <div class="sop-step"><div class="step-num">4</div><div class="step-text">Complete pending tasks</div></div>
+      </div>
+    </div>
+
+  </div>
 
 </div>
 
-<button onclick="copy('sig')">
-Copy Signature
-</button>
-
-</div>
-
-
-
-
-<div class="card">
-
-<h2>📅 Meeting SOP</h2>
-
-<p>
-1. Check calendar details
-</p>
-
-<p>
-2. Confirm attendees
-</p>
-
-<p>
-3. Add required CC members
-</p>
-
-<p>
-4. Send approved email
-</p>
-
-<p>
-5. Update tracker
-</p>
-
-</div>
-
-
-
-
-<div class="card">
-
-<h2>⏰ Late Arrival SOP</h2>
-
-<p>
-1. Inform manager immediately
-</p>
-
-<p>
-2. Send delay notification
-</p>
-
-<p>
-3. Update availability
-</p>
-
-<p>
-4. Complete pending tasks
-</p>
-
-</div>
-
-
-</div>
-
-
+<div class="toast" id="toast">Copied to clipboard!</div>
 
 <script>
-
+let currentCategory='all';
 
 async function checkAccess(){
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  if(!user){window.location.href='index.html';return}
 
-const {data:{user}}=
-await supabaseClient.auth.getUser();
+  const {data}=await supabaseClient
+    .from('eric').select('approved,role,email')
+    .eq('email',user.email).single();
 
+  if(!data||!data.approved){
+    window.location.href='index.html';return;
+  }
 
-if(!user){
+  // Show user email
+  const emailEl=document.getElementById('user-email');
+  emailEl.textContent=user.email;
+  emailEl.style.display='block';
 
-window.location.href="index.html";
+  // Show admin link for admins
+  if(data.role==='admin'){
+    document.getElementById('admin-link').style.display='inline-flex';
+  }
 
-return;
-
+  // Hide loader
+  setTimeout(()=>{
+    document.getElementById('loader').classList.add('hide');
+  },300);
 }
 
-
-const {data}=await supabaseClient
-.from("eric")
-.select("approved")
-.eq("email",user.email)
-.single();
-
-
-if(!data || !data.approved){
-
-window.location.href="index.html";
-
+function copyText(id,btn){
+  const text=document.getElementById(id).innerText.trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add('copied');
+    btn.innerHTML='<span>&#x2705;</span> Copied!';
+    showToast();
+    setTimeout(()=>{
+      btn.classList.remove('copied');
+      btn.innerHTML='<span>&#x1f4cb;</span> Copy';
+    },2000);
+  });
 }
 
-
+function showToast(){
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-
-function copy(id){
-
-navigator.clipboard.writeText(
-document.getElementById(id).innerText
-);
-
-alert("Copied");
-
+function filterCards(){
+  const q=document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.card').forEach(c=>{
+    const searchData=c.dataset.search||'';
+    const title=c.querySelector('.card-title')?.textContent||'';
+    const match=(searchData+' '+title).toLowerCase().includes(q);
+    const catMatch=currentCategory==='all'||c.dataset.category===currentCategory;
+    c.style.display=(match&&catMatch)?'':'none';
+  });
+  updateSectionVisibility();
+  updateNoResults();
 }
 
+function filterCategory(cat,btn){
+  currentCategory=cat;
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  filterCards();
+}
 
+function updateSectionVisibility(){
+  document.querySelectorAll('.section-title').forEach(title=>{
+    const section=title.dataset.section;
+    const grid=title.nextElementSibling;
+    if(!grid)return;
+    const visible=[...grid.querySelectorAll('.card')].some(c=>c.style.display!=='none');
+    title.style.display=visible?'':'none';
+    grid.style.display=visible?'':'none';
+  });
+}
+
+function updateNoResults(){
+  const existing=document.querySelector('.no-results');
+  if(existing)existing.remove();
+
+  const anyVisible=[...document.querySelectorAll('.card')].some(c=>c.style.display!=='none');
+  if(!anyVisible){
+    const div=document.createElement('div');
+    div.className='no-results';
+    div.innerHTML='<div class="no-results-icon">&#x1f50d;</div><div class="no-results-text">No matching resources found</div>';
+    document.getElementById('content').appendChild(div);
+  }
+}
 
 async function logout(){
-
-await supabaseClient.auth.signOut();
-
-window.location.href="index.html";
-
+  await supabaseClient.auth.signOut();
+  window.location.href='index.html';
 }
 
-
-
 checkAccess();
-
-
 </script>
 
-
 </body>
-
 </html>
