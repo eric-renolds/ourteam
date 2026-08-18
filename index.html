@@ -1,132 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Team Troy</title>
+<title>Team Troy Login</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
 
-* {
-    box-sizing: border-box;
-    font-family: Inter, Arial, sans-serif;
+body{
+font-family:Arial;
+background:#f5f7fb;
+display:flex;
+height:100vh;
+align-items:center;
+justify-content:center;
 }
 
-body {
-    margin:0;
-    background:#f5f7fb;
-    color:#111827;
+.card{
+background:white;
+padding:40px;
+border-radius:20px;
+width:350px;
+box-shadow:0 10px 30px #ddd;
+text-align:center;
 }
 
-.header {
-    background:#111827;
-    color:white;
-    padding:40px;
-    text-align:center;
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:10px;
+border:1px solid #ddd;
 }
 
-.header h1 {
-    font-size:48px;
-    margin:0;
+button{
+width:100%;
+padding:12px;
+background:#111827;
+color:white;
+border:0;
+border-radius:10px;
+cursor:pointer;
 }
 
-.header p {
-    opacity:.8;
+#message{
+margin-top:15px;
+color:#555;
 }
-
-
-.container {
-    max-width:1100px;
-    margin:40px auto;
-    padding:20px;
-}
-
-
-.grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-    gap:25px;
-}
-
-
-.card {
-
-    background:white;
-    padding:30px;
-    border-radius:24px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-
-}
-
-
-.card h2 {
-
-    margin-top:0;
-
-}
-
-
-button {
-
-    background:#111827;
-    color:white;
-    border:none;
-    padding:12px 20px;
-    border-radius:12px;
-    cursor:pointer;
-    margin-top:15px;
-
-}
-
-
-button:hover {
-
-    opacity:.8;
-
-}
-
-
-.box {
-
-    background:#f3f4f6;
-    padding:15px;
-    border-radius:12px;
-    white-space:pre-line;
-
-}
-
-
-.sop-step {
-
-    margin:10px 0;
-    padding:12px;
-    background:#f9fafb;
-    border-radius:10px;
-
-}
-
-
-.login {
-
-    background:white;
-    padding:30px;
-    border-radius:24px;
-    margin-bottom:30px;
-
-}
-
-
-input {
-
-    width:100%;
-    padding:14px;
-    border-radius:12px;
-    border:1px solid #ddd;
-    margin-top:10px;
-
-}
-
 
 </style>
 
@@ -136,193 +58,99 @@ input {
 <body>
 
 
-<div class="header">
+<div class="card">
 
 <h1>TEAM TROY</h1>
 
 <p>Internal Operations Portal</p>
 
-</div>
+
+<input id="email" placeholder="Email">
+
+<input id="password" type="password" placeholder="Password">
 
 
-
-<div class="container">
-
-
-<div class="login">
-
-<h2>Team Access</h2>
-
-<p>
-Enter your company email to request access.
-</p>
-
-<input placeholder="your@email.com">
-
-<button>
-Request Access
-</button>
-
-<p style="font-size:13px;color:#666">
-Access requires owner approval.
-</p>
-
-</div>
-
-
-
-<div class="grid">
-
-
-
-<div class="card">
-
-<h2>📧 CC List</h2>
-
-
-<div class="box" id="cc">
-
-operations@company.com
-manager@company.com
-accounts@company.com
-
-</div>
-
-
-<button onclick="copyText('cc')">
-
-Copy CC Emails
-
+<button onclick="login()">
+Login
 </button>
 
 
-</div>
-
-
-
-
-<div class="card">
-
-
-<h2>✍️ Email Signature</h2>
-
-
-<div class="box" id="signature">
-
-
-Regards,
-
-Team Troy
-
-Company Name
-
-Phone:
-Email:
-Website:
+<div id="message"></div>
 
 
 </div>
-
-
-<button onclick="copyText('signature')">
-
-Copy Signature
-
-</button>
-
-
-</div>
-
-
-
-
-
-<div class="card">
-
-
-<h2>📅 Meeting SOP</h2>
-
-
-<div class="sop-step">
-1. Check calendar details
-</div>
-
-
-<div class="sop-step">
-2. Confirm attendees
-</div>
-
-
-<div class="sop-step">
-3. Add required CC members
-</div>
-
-
-<div class="sop-step">
-4. Send approved meeting email
-</div>
-
-
-<div class="sop-step">
-5. Update tracker
-</div>
-
-
-</div>
-
-
-
-
-
-<div class="card">
-
-
-<h2>⏰ Late Arrival SOP</h2>
-
-
-<div class="sop-step">
-1. Inform manager immediately
-</div>
-
-
-<div class="sop-step">
-2. Send delay notification
-</div>
-
-
-<div class="sop-step">
-3. Update availability status
-</div>
-
-
-<div class="sop-step">
-4. Complete pending tasks
-</div>
-
-
-</div>
-
-
-
-
-</div>
-
-
-</div>
-
 
 
 
 <script>
 
 
-function copyText(id){
+async function login(){
 
-let text=document.getElementById(id).innerText;
 
-navigator.clipboard.writeText(text);
+let email =
+document.getElementById("email").value;
 
-alert("Copied!");
+
+let password =
+document.getElementById("password").value;
+
+
+
+const {data,error} =
+await supabaseClient.auth.signInWithPassword({
+
+email,
+password
+
+});
+
+
+
+if(error){
+
+document.getElementById("message").innerHTML =
+"Login failed";
+
+return;
+
+}
+
+
+
+const {data:userData,error:userError} =
+await supabaseClient
+.from("eric")
+.select("approved")
+.eq("email",email)
+.single();
+
+
+
+if(userError){
+
+document.getElementById("message").innerHTML =
+"User not approved";
+
+return;
+
+}
+
+
+
+if(userData.approved === true){
+
+window.location.href="portal.html";
+
+}
+
+else{
+
+document.getElementById("message").innerHTML =
+"Waiting for owner approval";
+
+}
+
 
 }
 
@@ -330,7 +158,5 @@ alert("Copied!");
 </script>
 
 
-
 </body>
-
 </html>
