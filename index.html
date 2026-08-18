@@ -1,204 +1,331 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-<title>Team Troy Login</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Troy - Internal Operations Portal</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
-
 <style>
-
+*{margin:0;padding:0;box-sizing:border-box}
 body{
-font-family:Arial;
-background:#f5f7fb;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);
+  padding:20px;
 }
-
-.card{
-background:white;
-padding:40px;
-border-radius:20px;
-width:350px;
-box-shadow:0 10px 30px #ddd;
-text-align:center;
+.login-card{
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:24px;
+  padding:48px 40px;
+  width:100%;
+  max-width:420px;
+  text-align:center;
+  box-shadow:0 25px 60px rgba(0,0,0,0.4);
 }
-
+.logo{
+  width:64px;height:64px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 24px;
+  font-size:28px;font-weight:800;color:#fff;
+  box-shadow:0 8px 24px rgba(99,102,241,0.4);
+}
+h1{
+  color:#fff;font-size:28px;font-weight:700;
+  letter-spacing:1px;margin-bottom:4px;
+}
+.subtitle{
+  color:rgba(255,255,255,0.5);font-size:14px;
+  margin-bottom:32px;
+}
+.tabs{
+  display:flex;gap:4px;
+  background:rgba(255,255,255,0.06);
+  border-radius:12px;padding:4px;
+  margin-bottom:28px;
+}
+.tab{
+  flex:1;padding:10px 8px;
+  border:none;border-radius:10px;
+  background:transparent;
+  color:rgba(255,255,255,0.4);
+  font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.3s;
+}
+.tab.active{
+  background:rgba(99,102,241,0.9);
+  color:#fff;
+  box-shadow:0 4px 12px rgba(99,102,241,0.3);
+}
+.tab:hover:not(.active){color:rgba(255,255,255,0.7)}
+.form-group{margin-bottom:16px;text-align:left}
+.form-group label{
+  display:block;color:rgba(255,255,255,0.6);
+  font-size:12px;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.5px;
+  margin-bottom:6px;
+}
 input{
-width:100%;
-padding:12px;
-margin:8px 0;
-border-radius:10px;
-border:1px solid #ddd;
+  width:100%;padding:14px 16px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  color:#fff;font-size:15px;
+  transition:all 0.3s;
+  outline:none;
 }
-
-button{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:0;
-border-radius:10px;
-background:#111827;
-color:white;
-cursor:pointer;
+input::placeholder{color:rgba(255,255,255,0.25)}
+input:focus{
+  border-color:rgba(99,102,241,0.6);
+  background:rgba(255,255,255,0.1);
+  box-shadow:0 0 0 3px rgba(99,102,241,0.15);
 }
-
+.btn{
+  width:100%;padding:14px;
+  border:none;border-radius:12px;
+  font-size:15px;font-weight:600;
+  cursor:pointer;transition:all 0.3s;
+  margin-top:8px;
+}
+.btn-primary{
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;
+  box-shadow:0 4px 16px rgba(99,102,241,0.3);
+}
+.btn-primary:hover{
+  transform:translateY(-1px);
+  box-shadow:0 6px 24px rgba(99,102,241,0.4);
+}
+.btn-primary:active{transform:translateY(0)}
 #msg{
-margin-top:15px;
+  margin-top:20px;padding:12px 16px;
+  border-radius:10px;font-size:14px;
+  display:none;
 }
-
+#msg.success{
+  display:block;
+  background:rgba(34,197,94,0.15);
+  border:1px solid rgba(34,197,94,0.3);
+  color:#4ade80;
+}
+#msg.error{
+  display:block;
+  background:rgba(239,68,68,0.15);
+  border:1px solid rgba(239,68,68,0.3);
+  color:#f87171;
+}
+#msg.info{
+  display:block;
+  background:rgba(99,102,241,0.15);
+  border:1px solid rgba(99,102,241,0.3);
+  color:#a5b4fc;
+}
+.hint{
+  color:rgba(255,255,255,0.35);
+  font-size:12px;margin-top:20px;
+}
+.hint a{color:rgba(99,102,241,0.8);text-decoration:none}
+.hint a:hover{text-decoration:underline}
+#password-group{transition:all 0.3s}
+.hidden{display:none!important}
+.loading .btn-primary{opacity:0.7;pointer-events:none}
+@media(max-width:480px){
+  .login-card{padding:32px 24px}
+  h1{font-size:24px}
+  .tab{font-size:11px;padding:8px 4px}
+}
 </style>
-
 </head>
-
 <body>
 
-<div class="card">
+<div class="login-card" id="card">
+  <div class="logo">T</div>
+  <h1>TEAM TROY</h1>
+  <p class="subtitle">Internal Operations Portal</p>
 
-<h1>TEAM TROY</h1>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('request')">Request Access</button>
+    <button class="tab" onclick="switchTab('login')">Login</button>
+    <button class="tab" onclick="switchTab('setup')">Set Up Account</button>
+  </div>
 
-<p>Internal Operations Portal</p>
+  <div id="request-form">
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="req-email" placeholder="you@company.com">
+    </div>
+    <button class="btn btn-primary" onclick="requestAccess()">Request Access</button>
+    <p class="hint">Enter your email and the admin will review your request</p>
+  </div>
 
+  <div id="login-form" class="hidden">
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="you@company.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="Your password">
+    </div>
+    <button class="btn btn-primary" onclick="login()">Login</button>
+    <p class="hint">Don't have a password yet? <a href="#" onclick="switchTab('setup');return false">Set up your account</a></p>
+  </div>
 
-<input id="email" placeholder="Email">
+  <div id="setup-form" class="hidden">
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="setup-email" placeholder="you@company.com">
+    </div>
+    <div class="form-group">
+      <label>Choose a Password</label>
+      <input type="password" id="setup-password" placeholder="Min 6 characters">
+    </div>
+    <button class="btn btn-primary" onclick="setupAccount()">Create Account</button>
+    <p class="hint">Only works after your access has been approved by admin</p>
+  </div>
 
-<input id="password" type="password" placeholder="Password">
-
-
-<button onclick="login()">
-Login
-</button>
-
-
-<button onclick="requestAccess()">
-Request Access
-</button>
-
-
-<div id="msg"></div>
-
-
+  <div id="msg"></div>
 </div>
 
-
-
 <script>
-
-
-async function login(){
-
-let email=document.getElementById("email").value;
-let password=document.getElementById("password").value;
-
-
-const {error}=await supabaseClient.auth.signInWithPassword({
-
-email,
-password
-
-});
-
-
-if(error){
-
-document.getElementById("msg").innerHTML=
-"Login failed";
-
-return;
-
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active',
+      (tab==='request'&&i===0)||(tab==='login'&&i===1)||(tab==='setup'&&i===2));
+  });
+  document.getElementById('request-form').classList.toggle('hidden',tab!=='request');
+  document.getElementById('login-form').classList.toggle('hidden',tab!=='login');
+  document.getElementById('setup-form').classList.toggle('hidden',tab!=='setup');
+  clearMsg();
 }
 
-
-const {data}=await supabaseClient
-.from("eric")
-.select("*")
-.eq("email",email)
-.single();
-
-
-if(!data){
-
-document.getElementById("msg").innerHTML=
-"Account pending setup";
-
-return;
-
+function showMsg(text,type){
+  const m=document.getElementById('msg');
+  m.textContent=text;
+  m.className=type;
 }
-
-
-if(data.approved){
-
-window.location.href="portal.html";
-
-}else{
-
-document.getElementById("msg").innerHTML=
-"Waiting for owner approval";
-
+function clearMsg(){
+  const m=document.getElementById('msg');
+  m.textContent='';m.className='';m.style.display='none';
 }
-
-
-}
-
-
 
 async function requestAccess(){
+  const email=document.getElementById('req-email').value.trim();
+  if(!email){showMsg('Please enter your email','error');return}
 
+  // Check if already exists
+  const {data:existing}=await supabaseClient
+    .from('eric').select('email,approved').eq('email',email).single();
 
-let email=document.getElementById("email").value;
-let password=document.getElementById("password").value;
+  if(existing){
+    if(existing.approved){
+      showMsg('You are already approved! Go to Login or Set Up Account.','info');
+    }else{
+      showMsg('Your request is already pending. Please wait for admin approval.','info');
+    }
+    return;
+  }
 
+  const {error}=await supabaseClient
+    .from('eric').insert({email:email,approved:false,role:'user'});
 
-if(!email || !password){
-
-alert("Enter email and password");
-
-return;
-
+  if(error){
+    showMsg('Something went wrong. Please try again.','error');
+    return;
+  }
+  showMsg('Request submitted! The admin will review your access shortly.','success');
+  document.getElementById('req-email').value='';
 }
 
+async function setupAccount(){
+  const email=document.getElementById('setup-email').value.trim();
+  const password=document.getElementById('setup-password').value;
 
-const {error}=await supabaseClient.auth.signUp({
+  if(!email||!password){showMsg('Please fill in both fields','error');return}
+  if(password.length<6){showMsg('Password must be at least 6 characters','error');return}
 
-email,
-password
+  // Check if approved
+  const {data}=await supabaseClient
+    .from('eric').select('approved').eq('email',email).single();
 
-});
+  if(!data){
+    showMsg('No access request found for this email. Request access first.','error');
+    return;
+  }
+  if(!data.approved){
+    showMsg('Your access is still pending approval. Please wait.','info');
+    return;
+  }
 
+  // Create Supabase auth account
+  const {error}=await supabaseClient.auth.signUp({email,password});
 
-if(error){
+  if(error){
+    if(error.message.includes('already registered')){
+      showMsg('Account already set up! Go to Login.','info');
+    }else{
+      showMsg(error.message,'error');
+    }
+    return;
+  }
 
-document.getElementById("msg").innerHTML=
-error.message;
-
-return;
-
+  showMsg('Account created! You can now login. Check your email if confirmation is needed.','success');
 }
 
+async function login(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
 
+  if(!email||!password){showMsg('Please fill in both fields','error');return}
 
-await supabaseClient
-.from("eric")
-.insert({
+  const {error}=await supabaseClient.auth.signInWithPassword({email,password});
 
-email:email,
-approved:false,
-role:"user"
+  if(error){
+    showMsg('Invalid email or password','error');
+    return;
+  }
 
-});
+  const {data}=await supabaseClient
+    .from('eric').select('approved,role').eq('email',email).single();
 
+  if(!data){
+    showMsg('Account not found in the system','error');
+    await supabaseClient.auth.signOut();
+    return;
+  }
 
+  if(!data.approved){
+    showMsg('Your access is still pending approval','info');
+    await supabaseClient.auth.signOut();
+    return;
+  }
 
-document.getElementById("msg").innerHTML=
-"Request submitted. Wait for approval.";
-
+  // Approved — redirect based on role
+  if(data.role==='admin'){
+    window.location.href='portal.html';
+  }else{
+    window.location.href='portal.html';
+  }
 }
 
-
-
+// If already logged in, redirect
+(async()=>{
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  if(user){
+    const {data}=await supabaseClient
+      .from('eric').select('approved').eq('email',user.email).single();
+    if(data&&data.approved){
+      window.location.href='portal.html';
+    }
+  }
+})();
 </script>
 
 </body>
