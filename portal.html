@@ -5,6 +5,10 @@
 
 <title>Team Troy Portal</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+
 <style>
 
 body{
@@ -13,6 +17,7 @@ background:#f5f7fb;
 margin:0;
 }
 
+
 .header{
 background:#111827;
 color:white;
@@ -20,56 +25,37 @@ padding:40px;
 text-align:center;
 }
 
+
 .container{
-max-width:1100px;
+max-width:1000px;
 margin:40px auto;
-padding:20px;
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-gap:25px;
-}
 
 .card{
-
 background:white;
 padding:30px;
 border-radius:20px;
-box-shadow:0 10px 30px #ddd;
-
+margin-bottom:20px;
+box-shadow:0 10px 25px #ddd;
 }
 
-button{
 
+button{
 background:#111827;
 color:white;
-border:none;
+border:0;
 padding:12px 20px;
 border-radius:10px;
 cursor:pointer;
-
 }
 
 
 .box{
-
 background:#f3f4f6;
 padding:15px;
 border-radius:10px;
 white-space:pre-line;
-
-}
-
-
-.step{
-
-padding:12px;
-background:#f9fafb;
-margin:10px 0;
-border-radius:10px;
-
 }
 
 
@@ -87,14 +73,14 @@ border-radius:10px;
 
 <p>Internal Operations Portal</p>
 
+<button onclick="logout()">
+Logout
+</button>
+
 </div>
 
 
-
 <div class="container">
-
-
-<div class="grid">
 
 
 <div class="card">
@@ -109,11 +95,9 @@ accounts@company.com
 
 </div>
 
-
 <button onclick="copy('cc')">
 Copy CC Emails
 </button>
-
 
 </div>
 
@@ -123,8 +107,7 @@ Copy CC Emails
 
 <h2>✍️ Email Signature</h2>
 
-
-<div id="signature" class="box">
+<div id="sig" class="box">
 
 Regards,
 
@@ -138,11 +121,9 @@ Website:
 
 </div>
 
-
-<button onclick="copy('signature')">
+<button onclick="copy('sig')">
 Copy Signature
 </button>
-
 
 </div>
 
@@ -153,27 +134,25 @@ Copy Signature
 
 <h2>📅 Meeting SOP</h2>
 
-
-<div class="step">
+<p>
 1. Check calendar details
-</div>
+</p>
 
-<div class="step">
+<p>
 2. Confirm attendees
-</div>
+</p>
 
-<div class="step">
+<p>
 3. Add required CC members
-</div>
+</p>
 
-<div class="step">
-4. Send approved meeting email
-</div>
+<p>
+4. Send approved email
+</p>
 
-<div class="step">
+<p>
 5. Update tracker
-</div>
-
+</p>
 
 </div>
 
@@ -184,27 +163,21 @@ Copy Signature
 
 <h2>⏰ Late Arrival SOP</h2>
 
-
-<div class="step">
+<p>
 1. Inform manager immediately
-</div>
+</p>
 
-<div class="step">
+<p>
 2. Send delay notification
-</div>
+</p>
 
-<div class="step">
-3. Update availability status
-</div>
+<p>
+3. Update availability
+</p>
 
-<div class="step">
+<p>
 4. Complete pending tasks
-</div>
-
-
-</div>
-
-
+</p>
 
 </div>
 
@@ -215,15 +188,63 @@ Copy Signature
 
 <script>
 
-function copy(id){
 
-let text=document.getElementById(id).innerText;
+async function checkAccess(){
 
-navigator.clipboard.writeText(text);
+const {data:{user}}=
+await supabaseClient.auth.getUser();
 
-alert("Copied!");
+
+if(!user){
+
+window.location.href="index.html";
+
+return;
 
 }
+
+
+const {data}=await supabaseClient
+.from("eric")
+.select("approved")
+.eq("email",user.email)
+.single();
+
+
+if(!data || !data.approved){
+
+window.location.href="index.html";
+
+}
+
+
+}
+
+
+function copy(id){
+
+navigator.clipboard.writeText(
+document.getElementById(id).innerText
+);
+
+alert("Copied");
+
+}
+
+
+
+async function logout(){
+
+await supabaseClient.auth.signOut();
+
+window.location.href="index.html";
+
+}
+
+
+
+checkAccess();
+
 
 </script>
 
