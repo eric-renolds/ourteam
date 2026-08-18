@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Team Troy</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    font-family: Inter, Arial, sans-serif;
+}
+
+body {
+    margin:0;
+    background:#f5f7fb;
+    color:#111827;
+}
+
+.header {
+    background:#111827;
+    color:white;
+    padding:40px;
+    text-align:center;
+}
+
+.header h1 {
+    font-size:48px;
+    margin:0;
+}
+
+.header p {
+    opacity:.8;
+}
+
+
+.container {
+    max-width:1100px;
+    margin:40px auto;
+    padding:20px;
+}
+
+
+.grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:25px;
+}
+
+
+.card {
+
+    background:white;
+    padding:30px;
+    border-radius:24px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+}
+
+
+.card h2 {
+
+    margin-top:0;
+
+}
+
+
+button {
+
+    background:#111827;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:12px;
+    cursor:pointer;
+    margin-top:15px;
+
+}
+
+
+button:hover {
+
+    opacity:.8;
+
+}
+
+
+.box {
+
+    background:#f3f4f6;
+    padding:15px;
+    border-radius:12px;
+    white-space:pre-line;
+
+}
+
+
+.sop-step {
+
+    margin:10px 0;
+    padding:12px;
+    background:#f9fafb;
+    border-radius:10px;
+
+}
+
+
+.login {
+
+    background:white;
+    padding:30px;
+    border-radius:24px;
+    margin-bottom:30px;
+
+}
+
+
+input {
+
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:1px solid #ddd;
+    margin-top:10px;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+<h1>TEAM TROY</h1>
+
+<p>Internal Operations Portal</p>
+
+</div>
+
+
+
+<div class="container">
+
+
+<div class="login">
+
+<h2>Team Access</h2>
+
+<p>
+Enter your company email to request access.
+</p>
+
+<input placeholder="your@email.com">
+
+<button>
+Request Access
+</button>
+
+<p style="font-size:13px;color:#666">
+Access requires owner approval.
+</p>
+
+</div>
+
+
+
+<div class="grid">
+
+
+
+<div class="card">
+
+<h2>📧 CC List</h2>
+
+
+<div class="box" id="cc">
+
+operations@company.com
+manager@company.com
+accounts@company.com
+
+</div>
+
+
+<button onclick="copyText('cc')">
+
+Copy CC Emails
+
+</button>
+
+
+</div>
+
+
+
+
+<div class="card">
+
+
+<h2>✍️ Email Signature</h2>
+
+
+<div class="box" id="signature">
+
+
+Regards,
+
+Team Troy
+
+Company Name
+
+Phone:
+Email:
+Website:
+
+
+</div>
+
+
+<button onclick="copyText('signature')">
+
+Copy Signature
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>📅 Meeting SOP</h2>
+
+
+<div class="sop-step">
+1. Check calendar details
+</div>
+
+
+<div class="sop-step">
+2. Confirm attendees
+</div>
+
+
+<div class="sop-step">
+3. Add required CC members
+</div>
+
+
+<div class="sop-step">
+4. Send approved meeting email
+</div>
+
+
+<div class="sop-step">
+5. Update tracker
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>⏰ Late Arrival SOP</h2>
+
+
+<div class="sop-step">
+1. Inform manager immediately
+</div>
+
+
+<div class="sop-step">
+2. Send delay notification
+</div>
+
+
+<div class="sop-step">
+3. Update availability status
+</div>
+
+
+<div class="sop-step">
+4. Complete pending tasks
+</div>
+
+
+</div>
+
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+<script>
+
+
+function copyText(id){
+
+let text=document.getElementById(id).innerText;
+
+navigator.clipboard.writeText(text);
+
+alert("Copied!");
+
+}
+
+
+</script>
+
+
+
+</body>
+
+</html>
