@@ -194,6 +194,7 @@ function showMsg(text, type){
   const m = document.getElementById('msg');
   m.textContent = text;
   m.className = type;
+  m.style.display = 'block';
 }
 function clearMsg(){
   const m = document.getElementById('msg');
